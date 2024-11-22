@@ -12,21 +12,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Set, Callable, Type, Any
-from threading import RLock, Event, Thread
-
-from rclpy.node import Node
-from rclpy.task import Future
-from rclpy.action import ActionClient
-from rclpy.action.client import ClientGoalHandle
-from rclpy.callback_groups import ReentrantCallbackGroup
-from action_msgs.msg import GoalStatus
+from threading import Thread
 
 from yasmin import State
 from yasmin import Blackboard
 from yasmin_ros import ActionState
-from yasmin_ros.yasmin_node import YasminNode
-from yasmin_ros.basic_outcomes import SUCCEED, ABORT, CANCEL, TIMEOUT, CONTINGENCY_FAILED
+from yasmin_ros.basic_outcomes import SUCCEED, CONTINGENCY_FAILED
 
 class ContingentActionState(State):
     """
