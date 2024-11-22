@@ -24,3 +24,4 @@ SUCCEED = "succeeded"  ##< Indicates that an operation has completed successfull
 ABORT = "aborted"  ##< Indicates that an operation was aborted before completion.
 CANCEL = "canceled"  ##< Indicates that an operation was canceled by the user or system.
 TIMEOUT = "timeout"  ##< Indicates that an operation has timed out and did not complete in a timely manner.
+CONTINGENCY_FAILED = "contingency_failed"

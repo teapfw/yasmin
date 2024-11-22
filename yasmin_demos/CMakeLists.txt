@@ -122,6 +122,11 @@ install(PROGRAMS
 )
 
 install(PROGRAMS
+  yasmin_demos/contingent_action_client_demo.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(PROGRAMS
   yasmin_demos/nav_demo.py
   DESTINATION lib/${PROJECT_NAME}
 )

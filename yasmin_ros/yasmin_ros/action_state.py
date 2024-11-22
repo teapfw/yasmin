@@ -129,6 +129,8 @@ class ActionState(State):
 
         if not self._create_goal_handler:
             raise ValueError("create_goal_handler is needed")
+        
+        self._cancel = False
 
         super().__init__(_outcomes)
 
@@ -138,6 +140,8 @@ class ActionState(State):
 
         This method cancels the goal sent to the action server, if it exists.
         """
+        self._cancel = True
+
         with self._goal_handle_lock:
             if self._goal_handle is not None:
                 self._goal_handle.cancel_goal()
@@ -163,7 +167,15 @@ class ActionState(State):
         goal = self._create_goal_handler(blackboard)
 
         self._node.get_logger().info(f"Waiting for action '{self._action_name}'")
-        act_available = self._action_client.wait_for_server(self._timeout)
+
+        # Wait for action server to connect, cancelling gracefully if a cancel request is received
+        act_available = False
+        time_start = self._node.get_clock().now()
+        while not act_available and ((self._node.get_clock().now() - time_start).nanoseconds/1e9 < self._timeout if self._timeout else True):
+            act_available = self._action_client.wait_for_server(1e-2)
+
+            if self._cancel:
+                return CANCEL
 
         if not act_available:
             self._node.get_logger().warn(
