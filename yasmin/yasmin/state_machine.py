@@ -36,16 +36,20 @@ class StateMachine(State):
         __start_cbs (List[Tuple[Callable[[Blackboard, str, List[Any]], None], List[Any]]]): A list of callbacks to call when the state machine starts.
         __transition_cbs (List[Tuple[Callable[[Blackboard, str, List[Any]], None], List[Any]]]): A list of callbacks to call during state transitions.
         __end_cbs (List[Tuple[Callable[[Blackboard, str, List[Any]], None], List[Any]]]): A list of callbacks to call when the state machine ends.
+        _quiet_recursion (bool): A flag to suppress logs when transitioning to self.
     """
 
-    def __init__(self, outcomes: Set[str]) -> None:
+    def __init__(self, outcomes: Set[str], quiet_recursion=False) -> None:
         """
         Initializes the StateMachine with a set of possible outcomes.
 
         Parameters:
             outcomes (Set[str]): A set of possible outcomes for the state machine.
+            quiet_recursion (bool): A flag to suppress logs when transitioning to self.
         """
         super().__init__(outcomes)
+
+        self._quiet_recursion = quiet_recursion
 
         ## A dictionary mapping state names to their corresponding state objects and transitions.
         self._states: Dict[str, Dict[str, Any]] = {}
@@ -400,9 +404,10 @@ class StateMachine(State):
 
             # Outcome is a state
             elif outcome in self._states:
-                yasmin.YASMIN_LOG_INFO(
-                    f"State machine transitioning '{self.__current_state}' : '{old_outcome}' --> '{outcome}'"
-                )
+                if not (self._quiet_recursion and self.__current_state == outcome):
+                    yasmin.YASMIN_LOG_INFO(
+                        f"State machine transitioning '{self.__current_state}' : '{old_outcome}' --> '{outcome}'"
+                    )
 
                 self._call_transition_cbs(
                     blackboard,
